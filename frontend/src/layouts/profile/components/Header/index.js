@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import useFacebookSDK from "hooks/useFacebookSDK"; // Import Facebook SDK hook
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -19,9 +20,6 @@ import Divider from "@mui/material/Divider";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDAvatar from "components/MDAvatar";
-
-// SocialFlow base styles
-import breakpoints from "assets/theme/base/breakpoints";
 
 // Firebase Services
 import { getUserProfile } from "firebaseService";
@@ -43,22 +41,20 @@ const socialIcons = {
 };
 
 function Header({ children }) {
+  useFacebookSDK(); // Initialize Facebook SDK
+
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
   const [profile, setProfile] = useState({
     name: "User Name",
     profilePic: defaultProfilePic,
     jobTitle: "User Role",
-    linkedAccounts: {}, // Store linked social media accounts
+    linkedAccounts: {},
   });
 
   useEffect(() => {
     const handleTabsOrientation = () => {
-      if (window.innerWidth < breakpoints.values.sm) {
-        setTabsOrientation("vertical");
-      } else {
-        setTabsOrientation("horizontal");
-      }
+      setTabsOrientation(window.innerWidth < 600 ? "vertical" : "horizontal");
     };
 
     window.addEventListener("resize", handleTabsOrientation);
@@ -94,16 +90,20 @@ function Header({ children }) {
   };
 
   const handleAddAccount = async (platform) => {
-    try {
-      if (platform === "instagram") {
-        // Step 1: Redirect to Instagram OAuth login
-        const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${process.env.REACT_APP_FACEBOOK_APP_ID}&redirect_uri=${process.env.REACT_APP_INSTAGRAM_REDIRECT_URI}&scope=pages_show_list,instagram_basic,instagram_manage_posts,instagram_content_publish,business_management&response_type=code`;
-        window.location.href = authUrl;
-      } else {
-        console.warn(`Account linking for ${platform} is not yet implemented.`);
-      }
-    } catch (error) {
-      console.error(`Error adding ${platform} account:`, error);
+    if (platform === "facebook") {
+      FB.login(
+        (response) => {
+          if (response.authResponse) {
+            console.log("Facebook login success:", response.authResponse);
+            // Fetch user data or link account in Firestore
+          } else {
+            console.log("User cancelled login or did not fully authorize.");
+          }
+        },
+        { scope: "pages_show_list,instagram_basic" }
+      );
+    } else {
+      console.warn(`Account linking for ${platform} is not yet implemented.`);
     }
   };
 
@@ -128,12 +128,7 @@ function Header({ children }) {
               alt="profile-image"
               size="xl"
               shadow="sm"
-              sx={{
-                width: "100px",
-                height: "100px",
-                border: "3px solid white",
-                marginTop: 2,
-              }}
+              sx={{ width: "100px", height: "100px", border: "3px solid white", mt: 2 }}
             />
           </Grid>
 
@@ -156,11 +151,7 @@ function Header({ children }) {
                 onChange={handleSetTabValue}
                 textColor="white"
                 indicatorColor="secondary"
-                sx={{
-                  ".MuiTabs-flexContainer": {
-                    gap: 2,
-                  },
-                }}
+                sx={{ ".MuiTabs-flexContainer": { gap: 2 } }}
               >
                 <Tab label="App" icon={<Icon fontSize="small">home</Icon>} />
                 <Tab label="Message" icon={<Icon fontSize="small">email</Icon>} />
@@ -187,48 +178,24 @@ function Header({ children }) {
             Linked Accounts
           </MDTypography>
 
-          {socialPlatforms.map((platform) => {
-            const accounts = profile.linkedAccounts[platform] || [];
-            return (
-              <MDBox key={platform} mb={2}>
-                <MDTypography variant="h6" fontWeight="bold">
-                  {platform.charAt(0).toUpperCase() + platform.slice(1)} Accounts
-                </MDTypography>
+          {socialPlatforms.map((platform) => (
+            <MDBox key={platform} mb={2}>
+              <MDTypography variant="h6" fontWeight="bold">
+                {platform.charAt(0).toUpperCase() + platform.slice(1)} Accounts
+              </MDTypography>
 
-                {accounts.length > 0 ? (
-                  <List>
-                    {accounts.map((account, index) => (
-                      <ListItem key={index} sx={{ pl: 2 }}>
-                        <ListItemIcon>
-                          <Icon>{socialIcons[platform] || "account_circle"}</Icon>
-                        </ListItemIcon>
-                        <ListItemText primary={account.username} secondary={account.email} />
-                      </ListItem>
-                    ))}
-                  </List>
-                ) : (
-                  <MDTypography variant="body2" color="textSecondary" sx={{ pl: 2 }}>
-                    No {platform} accounts linked.
-                  </MDTypography>
-                )}
-
-                {/* Always show "Add Account" button */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  sx={{
-                    mt: 1,
-                    color: "white",
-                  }}
-                  startIcon={<Icon>add</Icon>}
-                  onClick={() => handleAddAccount(platform)}
-                >
-                  Add {platform} Account
-                </Button>
-                <Divider sx={{ mt: 2 }} />
-              </MDBox>
-            );
-          })}
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ mt: 1, color: "white" }}
+                startIcon={<Icon>add</Icon>}
+                onClick={() => handleAddAccount(platform)}
+              >
+                Add {platform} Account
+              </Button>
+              <Divider sx={{ mt: 2 }} />
+            </MDBox>
+          ))}
         </Card>
       </MDBox>
     </MDBox>

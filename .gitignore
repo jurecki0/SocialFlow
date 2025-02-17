@@ -6,6 +6,7 @@
 .DS_Store
 
 /venv
+/frontend/firebaseConfig.js
 
 # testing
 /coverage
