@@ -38,14 +38,16 @@ function configs(labels, datasets) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: true, // Enable legend
-          position: "bottom", // Move labels under the chart
+          display: true,
+          position: "bottom",
           labels: {
-            boxWidth: 12, // Reduce label box size
-            padding: 10, // Add spacing to reduce clutter
+            boxWidth: 4,
+            boxHeight: 4,
+            padding: 10,
             font: {
-              size: 14, // Adjust font size for better readability
+              size: 14,
             },
+            color: "white",
           },
         },
       },

@@ -21,6 +21,7 @@ import MuiLink from "@mui/material/Link";
 // Firebase & Services
 import { auth, googleProvider } from "firebaseConfig";
 import { storeUserProfile } from "firebaseService";
+import { setPersistence, browserLocalPersistence, signInWithPopup } from "firebase/auth";
 
 // @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -56,20 +57,17 @@ function Basic() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await auth.signInWithPopup(googleProvider);
+      await setPersistence(auth, browserLocalPersistence); // Ensure Firebase persistence is enabled
+      const result = await signInWithPopup(auth, googleProvider);
       if (result && result.user) {
-        // Update AuthContext state with the user
-        login(result.user);
-        // Optionally store additional user data in Firestore
-        await storeUserProfile({
-          email: result.user.email,
-          displayName: result.user.displayName,
-        });
-        // Redirect to the dashboard (or another protected route)
-        navigate("/dashboard");
+        console.log("🔥 Google login successful:", result.user);
+        login(result.user); // Call the login function from context
+        // Store user info for debugging
+        localStorage.setItem("user", JSON.stringify(result.user));
+        navigate("/dashboard"); // Redirect after login
       }
     } catch (error) {
-      console.error("Google sign in error:", error);
+      console.error("Google sign-in error:", error);
     }
   };
 

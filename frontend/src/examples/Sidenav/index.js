@@ -84,61 +84,15 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   }, [dispatch, location]);
 
   // Render all the routes from the routes.js (All the visible items on the Sidenav)
-  const renderRoutes = routes.map(({ type, name, icon, title, noCollapse, key, href, route }) => {
-    let returnValue;
-
-    if (type === "collapse") {
-      returnValue = href ? (
-        <Link
-          href={href}
-          key={key}
-          target="_blank"
-          rel="noreferrer"
-          sx={{ textDecoration: "none" }}
-        >
-          <SidenavCollapse
-            name={name}
-            icon={icon}
-            active={key === collapseName}
-            noCollapse={noCollapse}
-          />
-        </Link>
-      ) : (
-        <NavLink key={key} to={route}>
-          <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
-        </NavLink>
-      );
-    } else if (type === "title") {
-      returnValue = (
-        <MDTypography
-          key={key}
-          color={textColor}
-          display="block"
-          variant="caption"
-          fontWeight="bold"
-          textTransform="uppercase"
-          pl={3}
-          mt={2}
-          mb={1}
-          ml={1}
-        >
-          {title}
-        </MDTypography>
-      );
-    } else if (type === "divider") {
-      returnValue = (
-        <Divider
-          key={key}
-          light={
-            (!darkMode && !whiteSidenav && !transparentSidenav) ||
-            (darkMode && !transparentSidenav && whiteSidenav)
-          }
-        />
-      );
-    }
-
-    return returnValue;
-  });
+  const sidebarRoutes = routes.filter((route) =>
+    ["dashboard", "accounts", "billing", "notifications", "profile"].includes(route.key)
+  );
+  const logoutRoute = routes.find((route) => route.key === "logout");
+  const renderRoutes = sidebarRoutes.map(({ type, name, icon, key, route }) => (
+    <NavLink key={key} to={route}>
+      <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+    </NavLink>
+  ));
 
   return (
     <SidenavRoot
@@ -178,7 +132,24 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
           (darkMode && !transparentSidenav && whiteSidenav)
         }
       />
-      <List>{renderRoutes}</List>
+      <MDBox display="flex" flexDirection="column" height="100%">
+        <List sx={{ flexGrow: 1 }}>
+          {sidebarRoutes.map(({ key, name, icon, route }) => (
+            <NavLink key={key} to={route}>
+              <SidenavCollapse name={name} icon={icon} active={key === collapseName} />
+            </NavLink>
+          ))}
+        </List>
+
+        {logoutRoute && (
+          <MDBox mt="auto" mb={2}>
+            <Divider />
+            <NavLink key={logoutRoute.key} to={logoutRoute.route}>
+              <SidenavCollapse name={logoutRoute.name} icon={logoutRoute.icon} active={false} />
+            </NavLink>
+          </MDBox>
+        )}
+      </MDBox>
     </SidenavRoot>
   );
 }

@@ -12,18 +12,18 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
 // Authentication layout components
-import CoverLayout from "layouts/authentication/components/CoverLayout";
+import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Firebase configuration
 import { auth, googleProvider } from "firebaseConfig";
 import { checkAndCreateUserProfile } from "firebaseService"; // Import function
 
 // Images
-import bgImage from "assets/images/bg-sign-up-cover.jpeg";
+import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 import { useAuth } from "context/AuthContext"; // adjust path if needed
 
-function Cover() {
+function Register() {
   const { login } = useAuth(); // Make sure to destructure login here!
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ function Cover() {
   };
 
   return (
-    <CoverLayout image={bgImage}>
+    <BasicLayout image={bgImage}>
       <Card>
         <MDBox
           variant="gradient"
@@ -133,8 +133,8 @@ function Cover() {
           </MDBox>
         </MDBox>
       </Card>
-    </CoverLayout>
+    </BasicLayout>
   );
 }
 
-export default Cover;
+export default Register;
