@@ -46,19 +46,24 @@ async function checkAndCreateUserProfile() {
 }
 
 // Fetch the user's profile from Firestore
-async function getUserProfile() {
-  const user = auth.currentUser;
-  if (!user) throw new Error("User not logged in");
+const getUserProfile = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return null;
 
-  const userDocRef = doc(firestore, "users", user.uid);
-  const docSnap = await getDoc(userDocRef);
-  if (docSnap.exists()) {
-    return docSnap.data();
-  } else {
-    console.log("No profile found for user:", user.uid);
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      return userSnap.data();
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
     return null;
   }
-}
+};
 
 export const fetchInstagramAccessToken = async (code) => {
   try {
@@ -167,6 +172,35 @@ export const fetchInstagramPosts = async (username) => {
   } catch (error) {
     console.error("Error fetching Instagram posts:", error);
     return [];
+  }
+};
+
+export const storeUserLinkedAccount = async (accountData) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No authenticated user.");
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      // Update existing user data
+      await updateDoc(userRef, {
+        linkedAccounts: arrayUnion(accountData),
+      });
+    } else {
+      // Create a new user document with the linked account
+      await setDoc(userRef, {
+        name: user.displayName || "Unknown",
+        email: user.email || "No Email",
+        profilePic: user.photoURL || "",
+        linkedAccounts: [accountData], // Store as an array
+      });
+    }
+
+    console.log("Account linked successfully!");
+  } catch (error) {
+    console.error("Error storing linked account:", error);
   }
 };
 

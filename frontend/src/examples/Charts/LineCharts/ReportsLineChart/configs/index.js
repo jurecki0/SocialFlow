@@ -14,31 +14,39 @@ Coded by www.creative-tim.com
 */
 
 function configs(labels, datasets) {
+  const formattedDatasets = Array.isArray(datasets) ? datasets : [datasets];
+
   return {
     data: {
       labels,
-      datasets: [
-        {
-          label: datasets.label,
-          tension: 0,
-          pointRadius: 5,
-          pointBorderColor: "transparent",
-          pointBackgroundColor: "rgba(255, 255, 255, .8)",
-          borderColor: "rgba(255, 255, 255, .8)",
-          borderWidth: 4,
-          backgroundColor: "transparent",
-          fill: true,
-          data: datasets.data,
-          maxBarThickness: 6,
-        },
-      ],
+      datasets: formattedDatasets.map((dataset) => ({
+        label: dataset.label || "Dataset",
+        tension: 0.4,
+        pointRadius: 5,
+        pointBorderColor: "transparent",
+        pointBackgroundColor: dataset.borderColor || "rgba(255, 255, 255, .8)",
+        borderColor: dataset.borderColor || "rgba(255, 255, 255, .8)",
+        borderWidth: 4,
+        backgroundColor: dataset.backgroundColor || "transparent",
+        fill: true,
+        data: dataset.data || [],
+        maxBarThickness: 6,
+      })),
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: true, // Enable legend
+          position: "bottom", // Move labels under the chart
+          labels: {
+            boxWidth: 12, // Reduce label box size
+            padding: 10, // Add spacing to reduce clutter
+            font: {
+              size: 14, // Adjust font size for better readability
+            },
+          },
         },
       },
       interaction: {

@@ -8,6 +8,9 @@
 /venv
 /frontend/firebaseConfig.js
 
+localhost-key.pem
+localhost.pem
+
 # testing
 /coverage
 

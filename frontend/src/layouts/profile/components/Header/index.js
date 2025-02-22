@@ -71,42 +71,66 @@ function Header({ children }) {
           name: userData.name || "User Name",
           profilePic: userData.profilePic || defaultProfilePic,
           jobTitle: userData.jobTitle || "User Role",
-          linkedAccounts: userData.linkedAccounts || {},
+          linkedAccounts: userData.linkedAccounts || [],
         });
       }
     };
-
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         fetchProfile();
       }
     });
-
     return () => unsubscribe();
   }, []);
 
   const handleSetTabValue = (event, newValue) => {
     setTabValue(newValue);
   };
-
   const handleAddAccount = async (platform) => {
+    const userProfile = await getUserProfile();
+    if (userProfile?.linkedAccounts?.some((acc) => acc.platform === platform)) {
+      console.log(`${platform} account already linked.`);
+      return;
+    }
     if (platform === "facebook") {
+      if (typeof FB === "undefined") {
+        console.error("Facebook SDK not loaded yet!");
+        return;
+      }
       FB.login(
-        (response) => {
-          if (response.authResponse) {
-            console.log("Facebook login success:", response.authResponse);
-            // Fetch user data or link account in Firestore
+        (loginResponse) => {
+          if (loginResponse.authResponse) {
+            console.log("Facebook login success:", loginResponse.authResponse);
+            const { accessToken, userID } = loginResponse.authResponse;
+            // Fetch Facebook user info
+            FB.api("/me", { fields: "id,name,email,picture" }, (fbUser) => {
+              console.log("Fetched Facebook user:", fbUser);
+              const accountData = {
+                platform: "facebook",
+                userId: userID,
+                username: fbUser.name,
+                email: fbUser.email || "N/A",
+                profilePic: fbUser.picture?.data?.url || "",
+                accessToken, // Store access token securely
+                linkedAt: new Date(),
+              };
+              // Save to Firestore
+              storeUserLinkedAccount(accountData)
+                .then(() => console.log("Facebook account linked successfully!"))
+                .catch((error) => console.error("Error storing Facebook account:", error));
+            });
           } else {
-            console.log("User cancelled login or did not fully authorize.");
+            console.warn("User cancelled Facebook login.");
           }
         },
-        { scope: "pages_show_list,instagram_basic" }
+        {
+          scope: "public_profile,email,pages_show_list,instagram_basic",
+        }
       );
     } else {
       console.warn(`Account linking for ${platform} is not yet implemented.`);
     }
   };
-
   return (
     <MDBox position="relative" mb={5} mx={{ xs: 2, sm: 3, md: 4, lg: 6 }} mt={{ xs: 5, md: 8 }}>
       <Card
@@ -186,12 +210,17 @@ function Header({ children }) {
 
               <Button
                 variant="contained"
-                color="primary"
-                sx={{ mt: 1, color: "white" }}
+                color="success" // Changed from "primary" to "success" for better visibility
+                sx={{
+                  mt: 2,
+                  backgroundColor: "#28a745", // Custom green color
+                  "&:hover": { backgroundColor: "#218838" },
+                  color: "white",
+                }}
                 startIcon={<Icon>add</Icon>}
                 onClick={() => handleAddAccount(platform)}
               >
-                Add {platform} Account
+                Link {platform} Account
               </Button>
               <Divider sx={{ mt: 2 }} />
             </MDBox>
