@@ -27,6 +27,8 @@
     "chart.js": "4.3.0",
     "chroma-js": "2.4.2",
     "firebase": "^11.3.1",
+    "instagram-graph-api": "^7.0.0",
+    "js-cookie": "^3.0.5",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-chartjs-2": "5.2.0",

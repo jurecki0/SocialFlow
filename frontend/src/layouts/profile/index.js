@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getUserProfile, storeUserProfile } from "firebaseService"; // Firestore functions
+import { getUserProfile, storeUserProfile } from "../../firebaseService";
 import { auth } from "firebaseConfig"; // Firebase Auth
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
@@ -7,7 +7,8 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import Header from "layouts/profile/components/Header"; // Import the Header component
+import Header from "layouts/profile/components/Header";
+import "./profile.css";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
@@ -19,7 +20,7 @@ function Profile() {
       const userData = await getUserProfile();
       if (userData) {
         setProfile(userData);
-        setUpdatedProfile(userData); // Pre-fill form
+        setUpdatedProfile(userData);
       }
     };
 
@@ -38,7 +39,7 @@ function Profile() {
   };
 
   return (
-    <MDBox py={3}>
+    <MDBox py={3} className="md-box-container">
       {/* Header Component - Uses Profile Data */}
       <Header
         name={profile?.name || "User Name"}
@@ -48,25 +49,30 @@ function Profile() {
 
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} md={8} lg={6}>
-          <Card>
+          <Card
+            sx={{
+              width: "100% !important",
+              maxWidth: "100% !important",
+            }}
+            className="profile-card"
+          >
             <MDBox p={3} textAlign="center">
-              {/* User Details */}
-              <MDTypography variant="h4">{profile?.name || "User Name"}</MDTypography>
-              <MDTypography variant="subtitle1" color="textSecondary">
+              <MDTypography variant="h4" className="user-name">
+                {profile?.name || "User Name"}
+              </MDTypography>
+              <MDTypography variant="subtitle1" className="user-role">
                 {profile?.email || "email@example.com"}
               </MDTypography>
               <MDTypography variant="body1" mt={1}>
                 {profile?.description || "User bio goes here..."}
               </MDTypography>
 
-              {/* Edit Profile Button */}
               <MDBox mt={3}>
                 <MDButton variant="contained" color="info" onClick={() => setEditing(true)}>
                   Edit Profile
                 </MDButton>
               </MDBox>
 
-              {/* Edit Profile Form */}
               {editing && (
                 <MDBox mt={3} textAlign="left">
                   <MDInput
@@ -85,10 +91,20 @@ function Profile() {
                     multiline
                   />
                   <MDBox mt={2} display="flex" justifyContent="space-between">
-                    <MDButton variant="contained" color="success" onClick={handleUpdateProfile}>
+                    <MDButton
+                      variant="contained"
+                      color="success"
+                      onClick={handleUpdateProfile}
+                      className="add-account-button"
+                    >
                       Save
                     </MDButton>
-                    <MDButton variant="outlined" color="error" onClick={() => setEditing(false)}>
+                    <MDButton
+                      variant="outlined"
+                      color="error"
+                      onClick={() => setEditing(false)}
+                      className="delete-button"
+                    >
                       Cancel
                     </MDButton>
                   </MDBox>

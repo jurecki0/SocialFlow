@@ -36,6 +36,7 @@ import MDButton from "components/MDButton";
 
 // Custom styles for the Configurator
 import ConfiguratorRoot from "examples/Configurator/ConfiguratorRoot";
+import Cookies from "js-cookie";
 
 // SocialFlow context
 import {
@@ -63,20 +64,24 @@ function Configurator() {
 
   // Use the useEffect hook to change the button state for the sidenav type based on window size.
   useEffect(() => {
-    // A function that sets the disabled state of the buttons for the sidenav type.
+    // 🔹 1. Handle resizing logic for disabling buttons
     function handleDisabled() {
-      return window.innerWidth > 1200 ? setDisabled(false) : setDisabled(true);
+      setDisabled(window.innerWidth <= 1200);
     }
 
-    // The event listener that's calling the handleDisabled function when resizing the window.
+    // Add event listener for resize
     window.addEventListener("resize", handleDisabled);
+    handleDisabled(); // Initial check
 
-    // Call the handleDisabled function to set the state with the initial value.
-    handleDisabled();
+    // 🔹 2. Load dark mode setting from cookies
+    const savedTheme = Cookies.get("darkMode");
+    if (savedTheme) {
+      setDarkMode(dispatch, savedTheme === "true"); // Convert "true"/"false" string to boolean
+    }
 
-    // Remove event listener on cleanup
+    // Cleanup: Remove event listener on component unmount
     return () => window.removeEventListener("resize", handleDisabled);
-  }, []);
+  }, [dispatch]);
 
   const handleCloseConfigurator = () => setOpenConfigurator(dispatch, false);
   const handleTransparentSidenav = () => {
@@ -92,7 +97,11 @@ function Configurator() {
     setTransparentSidenav(dispatch, false);
   };
   const handleFixedNavbar = () => setFixedNavbar(dispatch, !fixedNavbar);
-  const handleDarkMode = () => setDarkMode(dispatch, !darkMode);
+  const handleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(dispatch, newDarkMode);
+    Cookies.set("darkMode", newDarkMode, { expires: 30 });
+  };
 
   // sidenav type buttons styles
   const sidenavTypeButtonsStyles = ({

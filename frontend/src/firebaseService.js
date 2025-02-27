@@ -1,5 +1,10 @@
-import { firestore, auth } from "./firebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { Client, GetPageInfoRequest, GetPageMediaRequest, GetMediaInsightsRequest, GetMediaInsightsResponse } from "instagram-graph-api";
+import { auth, firestore } from "./firebaseConfig";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+
+const getInstagramClient = (accessToken) => {
+  return new Client({ accessToken });
+};
 
 // Store or update user profile in Firestore
 async function storeUserProfile(profileData) {
@@ -32,7 +37,6 @@ async function checkAndCreateUserProfile() {
       name: user.displayName || "New User",
       email: user.email || "",
       profilePic: user.photoURL || "",
-      description: "New user profile",
       createdAt: new Date().toISOString(),
     };
 
@@ -51,7 +55,7 @@ const getUserProfile = async () => {
     const user = auth.currentUser;
     if (!user) return null;
 
-    const userRef = doc(db, "users", user.uid);
+    const userRef = doc(firestore, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
@@ -130,20 +134,26 @@ export const fetchInstagramStats = async (username) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("No user logged in");
-    const userRef = await firebase.firestore().collection("users").doc(user.uid).get();
-    const userData = userRef.data();
-    const account = userData.linkedAccounts.find((acc) => acc.username === username);
-    if (!account) return [];
-    const response = await fetch(
-      `https://graph.instagram.com/me/insights?metric=follower_count&period=day&access_token=${account.accessToken}`,
-      { method: "GET" }
-    );
 
-    const data = await response.json();
-    return data.data || [];
+    const userRef = doc(firestore, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) throw new Error("User not found");
+
+    const account = userSnap.data().linkedAccounts.find((acc) => acc.username === username);
+    if (!account) throw new Error("Instagram account not linked");
+
+    // ✅ Use `GetPageInfoRequest` to get Instagram Business Page Info
+    const request = new GetPageInfoRequest(account.accessToken, account.userId);
+
+    const response = await request.execute();
+
+    return {
+      name: response.getName(),
+      followerCount: response.getFollowers(),
+    };
   } catch (error) {
-    console.error("Error fetching Instagram followers:", error);
-    return [];
+    console.error("❌ Error fetching Instagram insights:", error);
+    return {};
   }
 };
 
@@ -159,28 +169,62 @@ export const fetchInstagramPosts = async (username) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("No user logged in");
-    const userRef = await firebase.firestore().collection("users").doc(user.uid).get();
-    const userData = userRef.data();
-    const account = userData.linkedAccounts.find((acc) => acc.username === username);
-    if (!account) return [];
+
+    const userRef = doc(firestore, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) throw new Error("User not found");
+
+    const account = userSnap.data().linkedAccounts.find((acc) => acc.username === username);
+    if (!account) throw new Error("Instagram account not linked");
+
+    const { accessToken } = account;
+
+    // Fetch posts from Instagram API
     const response = await fetch(
-      `https://graph.instagram.com/me/media?fields=id,caption,media_url,thumbnail_url&access_token=${account.accessToken}`,
-      { method: "GET" }
+      `https://graph.facebook.com/v22.0/${account.userId}/media?fields=id,caption,media_url,thumbnail_url,timestamp&access_token=${accessToken}`
     );
+
     const data = await response.json();
-    return data.data || [];
+    if (data.error) throw new Error(data.error.message);
+
+    return data.data; // Returns an array of posts
   } catch (error) {
-    console.error("Error fetching Instagram posts:", error);
+    console.error("❌ Error fetching Instagram posts:", error);
     return [];
   }
 };
 
-export const storeUserLinkedAccount = async (accountData) => {
+export const fetchPostPerformance = async (postId, accessToken) => {
+  try {
+    // 🔹 Initialize the API request
+    const request = new GetMediaInsightsRequest(accessToken, postId, [
+      "engagement",
+      "likes",
+      "comments",
+    ]);
+
+    // 🔹 Execute API request
+    const response = await request.execute();
+
+    // 🔹 Extract insights from response
+    const insights = response.getMetrics();
+    return {
+      engagement: insights.engagement || 0,
+      likes: insights.likes || 0,
+      comments: insights.comments || 0,
+    };
+  } catch (error) {
+    console.error("❌ Error fetching post performance:", error);
+    return { engagement: 0, likes: 0, comments: 0 };
+  }
+};
+
+const storeUserLinkedAccount = async (accountData) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("No authenticated user.");
 
-    const userRef = doc(db, "users", user.uid);
+    const userRef = doc(firestore, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
@@ -204,4 +248,4 @@ export const storeUserLinkedAccount = async (accountData) => {
   }
 };
 
-export { storeUserProfile, getUserProfile, checkAndCreateUserProfile };
+export { storeUserProfile, getUserProfile, checkAndCreateUserProfile, storeUserLinkedAccount };

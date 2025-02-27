@@ -50,6 +50,7 @@ import brandDark from "assets/images/logo-ct-dark.png";
 import PrivateRoute from "components/PrivateRoutes";
 
 import { fetchInstagramAccessToken } from "firebaseService";
+import "base.css";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();

@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "firebaseConfig"; // Make sure this is correctly imported
+import { auth } from "firebaseConfig";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(undefined); // Change `null` to `undefined`
+  const [user, setUser] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
   const login = (firebaseUser) => {
@@ -31,14 +31,14 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem("user");
       }
-      setLoading(false); // Done loading
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   if (loading) {
-    return <div></div>; // Prevent rendering until Firebase loads
+    return <div></div>;
   }
 
   return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;

@@ -1,0 +1,197 @@
+/* General Layout */
+.md-box-container {
+    position: relative;
+    margin-bottom: 5rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 2rem;
+}
+
+@media (max-width: 1200px) {
+    .md-box-container, .profile-card, .linked-accounts-card {
+        max-width: 100% !important;
+        width: 100%;
+        padding: 2rem;
+    }
+}
+
+/* Default Styles */
+.css-1njqaue-MuiGrid-root {
+    margin-left: 8% !important;
+    padding: 8%;
+    -webkit-flex-basis: 100% !important;
+    -ms-flex-preferred-size: 100% !important;
+    flex-basis: 100% !important;
+    -webkit-box-flex: 0 !important;
+    -webkit-flex-grow: 0 !important;
+    -ms-flex-positive: 0 !important;
+    flex-grow: 0 !important;
+    max-width: 80% !important; /* Default to 80% width */
+    height: auto !important;
+}
+
+/* Responsive Fix - Ensure 100% width under 1200px */
+@media (max-width: 1200px) {
+    .css-1njqaue-MuiGrid-root {
+        margin: 0 auto !important; /* Center it properly */
+        padding-left: 6% !important; /* Reduce padding for smaller screens */
+        padding-right: 9% !important;
+        max-width: 100% !important; /* Allow full width */
+    }
+
+    .css-164j4u4-MuiPaper-root-MuiCard-root {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .css-12g86n3-MuiPaper-root-MuiCard-root {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .css-8wqzlf-MuiGrid-root {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 100vw !important;
+        flex-direction: row !important;
+        display: flex !important;
+    }
+}
+
+/* Profile Card */
+.profile-card {
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+    background-size: cover;
+    background-position: center;
+    margin: auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .profile-card {
+        width: 100%;
+        padding: 2rem;
+    }
+}
+
+/* Profile Image */
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border: 3px solid white;
+    margin-top: 2rem;
+}
+
+/* User Info */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.user-role {
+    font-weight: 400;
+    color: var(--primary-color);
+}
+
+/* Tabs */
+.app-bar {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tabs-container {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+}
+
+/* Linked Accounts */
+.linked-accounts-card {
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
+    margin: auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+    .linked-accounts-card {
+        width: 100%;
+        padding: 2rem;
+    }
+}
+
+.linked-account-card {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .linked-account-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .linked-avatar {
+        margin-bottom: 1rem;
+    }
+}
+
+.linked-avatar {
+    margin-right: 1rem;
+}
+
+.linked-username {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.link-account-btn {
+    color: var(--primary-color);
+}
+
+.delete-button {
+    min-width: auto;
+}
+
+/* Add Accounts */
+.add-account-button {
+    width: 100%;
+    background-color: #28a745 !important;
+    color: white !important;
+    text-transform: none;
+    font-size: 1rem;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none !important;
+}
+
+.add-account-button:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 600px) {
+    .add-account-button {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+    .profile-card, .linked-accounts-card {
+        padding: 1.5rem;
+    }
+}

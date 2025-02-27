@@ -7,8 +7,8 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import LogOut from "layouts/authentication/logout";
-
-// @mui icons
+import InstagramCallback from "layouts/authentication/instagram/InstagramCallback";
+import AccountDetails from "layouts/accounts/AccountDetails";
 import Icon from "@mui/material/Icon";
 
 const routes = [
@@ -83,6 +83,22 @@ const routes = [
     route: "/authentication/logout",
     component: <LogOut />,
     protected: true,
+  },
+  {
+    type: "route",
+    name: "Instagram Callback",
+    key: "instagram-callback",
+    route: "/auth/instagram/callback",
+    component: <InstagramCallback />,
+    protected: false,
+  },
+  {
+    type: "route",
+    name: "Account Details",
+    key: "account-details",
+    route: "/accounts/:username",
+    component: <AccountDetails />,
+    protected: false,
   },
 ];
 

@@ -1,0 +1,151 @@
+.linked-accounts-container {
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-color);
+    margin-left: 15%;
+    margin-top: 1%;
+}
+
+/* Account Section Titles */
+.account-section-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    color: var(--primary-text);
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* 4-column layout above 1200px */
+@media (min-width: 1200px) {
+    .account-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+.account-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    background-color: var(--card-bg);
+    max-width: 200px;
+}
+
+.account-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Profile Picture */
+.account-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Username Text */
+.account-username {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+}
+
+.delete-button {
+    background-color: var(--error);
+    color: white;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+    font-size: 0.75rem;
+}
+
+.delete-button:hover {
+    background-color: var(--error-hover);
+}
+
+.no-accounts-message {
+    text-align: center;
+    font-size: 1rem;
+    color: var(--secondary-text);
+    padding: 20px;
+}
+
+@media (max-width: 1200px) {
+    .linked-accounts-container {
+        margin-left: 5%;
+    }
+    .account-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Smaller cards on smaller screens */
+    }
+    .account-card {
+        max-width: 140px;
+    }
+}
+
+@media (max-width: 768px) {
+    .linked-accounts-container {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    .account-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Smaller on mobile */
+        gap: 0.5rem;
+    }
+    .account-card {
+        padding: 8px;
+        max-width: 120px;
+    }
+}
+
+/* ========================= */
+/* Account Details Styling   */
+/* ========================= */
+
+.account-details-container {
+    padding: 2rem;
+    margin: auto;
+    max-width: 900px;
+}
+
+.account-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.posts-section {
+    margin-top: 2rem;
+}
+
+.post-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.post-image {
+    width: 100%;
+    height: auto;
+}
+
+.post-caption {
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: var(--primary-text);
+}
